@@ -1,4 +1,4 @@
-class Api::NumbersController < ApplicationController
+class Api::NumbersController < ApiController
   before_action :set_random_number
 
   def show
@@ -7,6 +7,20 @@ class Api::NumbersController < ApplicationController
     end
   end
 
+
+  def create
+    @num = Number.create!(num_params)
+    json_response(@num)
+  end
+  # def create
+  #   @num = Number.new(num_params)
+  #   if @num.save
+  #     render "api/numbers/show"
+  #   else
+  #     render json: @num.errors.full_messages, status: :unprocessable_entity
+  #   end
+  # end
+
   private
 
   # generate a random number between the lower and upper bounds
@@ -14,5 +28,13 @@ class Api::NumbersController < ApplicationController
     @lower = Number.find(params[:id]).lower_bound
     @upper = Number.find(params[:id]).upper_bound
     @random_number = rand(@lower..@upper)
+  end
+
+  def num_params
+    params.require(:number).permit(:upper_bound, :lower_bound, :created_by)
+  end
+
+  def json_response(object, status = :ok)
+    render json: object, status: status
   end
 end
